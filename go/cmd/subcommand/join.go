@@ -12,9 +12,25 @@ type PersonWithPost struct {
 	models.Post
 }
 
+const selectStatement = `
+person.id,
+person.name,
+post.id,
+person.create_at,
+person.update_at,
+post.person_id,
+post.text,
+post.create_at,
+post.update_at
+`
+
+const joinStatement = `
+inner join post on person.id = post.person_id
+`
+
 func Join(db *gorm.DB) error {
 	results := []*PersonWithPost{}
-	if err := db.Table("person").Select("person.id, person.name, post.id, post.person_id, post.text").Joins("inner join post on person.id = post.person_id").Scan(&results).Error; err != nil {
+	if err := db.Table("person").Select(selectStatement).Joins(joinStatement).Scan(&results).Error; err != nil {
 		return err
 	}
 
